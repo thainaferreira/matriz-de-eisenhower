@@ -1,11 +1,9 @@
-from app.exc.TasksError import InvalidLevelValue
+import sqlalchemy
 from app.models.eisenhowers_model import Eisenhower
 from app.models.tasks_model import Task
 from app.models.tasks_categories_model import TasksCategories
 from app.controllers.categories_controller import get_category_id_by_name_or_create_if_not_exist
 from flask import jsonify, request, current_app
-import psycopg2
-import pdb
 
 eisenhower_default = {
     'Do It First': {'importance': 1, 'urgency': 1},
@@ -13,6 +11,18 @@ eisenhower_default = {
     'Schedule It': {'importance': 2, 'urgency': 1},
     'Delete It': {'importance': 2, 'urgency': 2}
 }
+
+def populate_db():
+    session = current_app.db.session
+    for key in eisenhower_default.keys():
+        exist = Eisenhower.query.filter_by(type=key).first()
+
+        if not exist:
+            eisenhower = Eisenhower(type=key)
+
+            session.add(eisenhower)
+            session.commit()
+        
 
 def get_eisenhower(importance: int, urgency: int):
     if importance == 1 and urgency == 1:
@@ -45,6 +55,8 @@ def create_relations_task_categories(task_id: int, categories_list: list):
 def create_task():
     data = request.json
 
+    populate_db()
+
     eisenhower = get_eisenhower(data['importance'], data['urgency'])
 
     if not eisenhower:
@@ -64,7 +76,7 @@ def create_task():
 
         return jsonify(task.serializer()), 201
 
-    except psycopg2.errors.UniqueViolation:
+    except sqlalchemy.exc.IntegrityError:
         return {'msg': 'Task already exists!'}, 409
 
 
