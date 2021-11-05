@@ -86,7 +86,7 @@ Rota responsável de fazer a deleção dos dados na tabela categories.
 
 Esta rota é responsável por fazer a inserção dos dados na tabela tasks:
 
-`RESPONSE STATUS -> HTTP 200 (ok)`
+`RESPONSE STATUS -> HTTP 201 (created)`
 
 <img width="100%" src='https://files-kenzie-academy-brasil.s3.amazonaws.com/q3/sprint5/entrega-matriz-eisenhower/image-9.png' alt='exemplo requisição post para criar uma task'/>
 
